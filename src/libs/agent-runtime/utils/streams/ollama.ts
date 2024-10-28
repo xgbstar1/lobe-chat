@@ -6,6 +6,7 @@ import { nanoid } from '@/utils/uuid';
 import {
   StreamProtocolChunk,
   StreamStack,
+  convertIterableToStream,
   createCallbacksTransformer,
   createSSEProtocolTransformer,
 } from './protocol';
@@ -25,7 +26,7 @@ export const OllamaStream = (
 ): ReadableStream<string> => {
   const streamStack: StreamStack = { id: 'chat_' + nanoid() };
 
-  return res
+  return convertIterableToStream(res)
     .pipeThrough(createSSEProtocolTransformer(transformOllamaStream, streamStack))
     .pipeThrough(createCallbacksTransformer(cb));
 };
