@@ -26,7 +26,7 @@ export const OllamaStream = (
 ): ReadableStream<string> => {
   const streamStack: StreamStack = { id: 'chat_' + nanoid() };
 
-  return convertIterableToStream(res)
+  return res
     .pipeThrough(createSSEProtocolTransformer(transformOllamaStream, streamStack))
     .pipeThrough(createCallbacksTransformer(cb));
 };
