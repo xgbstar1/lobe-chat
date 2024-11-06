@@ -58,18 +58,17 @@ const activeBaseChatsWithoutTool = (s: ChatStoreState) => {
  */
 const mainDisplayChats = (s: ChatStoreState): ChatMessage[] => {
   // 如果没有 activeThreadId，则返回所有的主消息
-  return activeBaseChats(s);
-  // const mains = activeBaseChats(s).filter((m) => !m.threadId);
-  // if (!s.activeThreadId) return mains;
-  //
-  // const thread = s.threadMaps[s.activeTopicId!]?.find((t) => t.id === s.activeThreadId);
-  //
-  // if (!thread) return mains;
-  //
-  // const sourceIndex = mains.findIndex((m) => m.id === thread.sourceMessageId);
-  // const sliced = mains.slice(0, sourceIndex + 1);
-  //
-  // return [...sliced, ...activeBaseChats(s).filter((m) => m.threadId === s.activeThreadId)];
+  const mains = activeBaseChats(s).filter((m) => !m.threadId);
+  if (!s.activeThreadId) return mains;
+
+  const thread = s.threadMaps[s.activeTopicId!]?.find((t) => t.id === s.activeThreadId);
+
+  if (!thread) return mains;
+
+  const sourceIndex = mains.findIndex((m) => m.id === thread.sourceMessageId);
+  const sliced = mains.slice(0, sourceIndex + 1);
+
+  return [...sliced, ...activeBaseChats(s).filter((m) => m.threadId === s.activeThreadId)];
 };
 
 const mainDisplayChatIDs = (s: ChatStoreState) => {
@@ -119,6 +118,12 @@ const chatsMessageString = (s: ChatStoreState): string => {
 
 const getMessageById = (id: string) => (s: ChatStoreState) =>
   chatHelpers.getMessageById(activeBaseChats(s), id);
+
+const countMessagesByThreadId = (id: string) => (s: ChatStoreState) => {
+  const messages = activeBaseChats(s).filter((m) => m.threadId === id);
+
+  return messages.length;
+};
 
 const getMessageByToolCallId = (id: string) => (s: ChatStoreState) => {
   const messages = activeBaseChats(s);
@@ -171,6 +176,7 @@ export const chatSelectors = {
   activeBaseChats,
   activeBaseChatsWithoutTool,
   chatsMessageString,
+  countMessagesByThreadId,
   currentChatKey,
   currentChatLoadingState,
   currentChatsWithHistoryConfig,

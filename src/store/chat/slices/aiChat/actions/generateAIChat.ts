@@ -32,6 +32,7 @@ interface ProcessMessageParams {
    * the RAG query content, should be embedding and used in the semantic search
    */
   ragQuery?: string;
+  threadId?: string;
 }
 
 export interface AIGenerateAction {
@@ -117,7 +118,7 @@ export const generateAIChat: StateCreator<
   },
 
   sendMessage: async ({ message, files, onlyAddUserMessage, isWelcomeQuestion }) => {
-    const { internal_coreProcessMessage, activeTopicId, activeId } = get();
+    const { internal_coreProcessMessage, activeTopicId, activeId, activeThreadId } = get();
     if (!activeId) return;
 
     const fileIdList = files?.map((f) => f.id);
@@ -137,6 +138,7 @@ export const generateAIChat: StateCreator<
       sessionId: activeId,
       // if there is activeTopicId，then add topicId to message
       topicId: activeTopicId,
+      threadId: activeThreadId,
     };
 
     const agentConfig = getAgentChatConfig();
@@ -213,6 +215,7 @@ export const generateAIChat: StateCreator<
     await internal_coreProcessMessage(messages, id, {
       isWelcomeQuestion,
       ragQuery: get().internal_shouldUseRAG() ? message : undefined,
+      threadId: activeThreadId,
     });
 
     set({ isCreatingMessage: false }, false, n('creatingMessage/stop'));
@@ -308,6 +311,7 @@ export const generateAIChat: StateCreator<
       parentId: userMessageId,
       sessionId: get().activeId,
       topicId: activeTopicId, // if there is activeTopicId，then add it to topicId
+      threadId: params?.threadId,
       fileChunks,
       ragQueryId,
     };
@@ -511,7 +515,7 @@ export const generateAIChat: StateCreator<
 
     if (contextMessages.length <= 0) return;
 
-    const { internal_coreProcessMessage } = get();
+    const { internal_coreProcessMessage, activeThreadId } = get();
 
     const latestMsg = contextMessages.findLast((s) => s.role === 'user');
 
@@ -520,6 +524,7 @@ export const generateAIChat: StateCreator<
     await internal_coreProcessMessage(contextMessages, latestMsg.id, {
       traceId,
       ragQuery: get().internal_shouldUseRAG() ? latestMsg.content : undefined,
+      threadId: activeThreadId,
     });
   },
 
