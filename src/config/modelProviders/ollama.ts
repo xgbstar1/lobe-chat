@@ -292,6 +292,10 @@ const Ollama: ModelProviderCard = {
   modelsUrl: 'https://ollama.com/library',
   name: 'Ollama',
   showApiKey: false,
+  smoothing: {
+    speed: 2,
+    text: true,
+  },
   url: 'https://ollama.com',
 };
 

@@ -24,6 +24,9 @@ const LMStudio: ModelProviderCard = {
   modelList: { showModelFetcher: true },
   modelsUrl: 'https://lmstudio.ai/models',
   name: 'LM Studio',
+  proxyUrl: {
+    placeholder: 'http://127.0.0.1:1234/v1',
+  },
   showApiKey: false,
   smoothing: {
     speed: 2,

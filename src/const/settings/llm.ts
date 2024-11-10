@@ -91,6 +91,7 @@ export const DEFAULT_LLM_CONFIG: UserModelProviderConfig = {
   lmstudio: {
     enabled: false,
     enabledModels: filterEnabledModels(LMStudioProviderCard),
+    fetchOnClient: true,
   },
   minimax: {
     enabled: false,
