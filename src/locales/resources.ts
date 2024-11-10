@@ -1,3 +1,5 @@
+import { DEFAULT_LANG } from '@/const/locale';
+
 import resources from './default';
 
 export const locales = [
@@ -23,7 +25,7 @@ export type NS = keyof DefaultResources;
 export type Locales = (typeof locales)[number];
 
 export const normalizeLocale = (locale?: string): string => {
-  if (!locale) return 'en-US';
+  if (!locale) return DEFAULT_LANG;
 
   if (locale.startsWith('ar')) return 'ar';
 
@@ -35,7 +37,7 @@ export const normalizeLocale = (locale?: string): string => {
     }
   }
 
-  return 'en-US';
+  return DEFAULT_LANG;
 };
 
 type LocaleOptions = {
