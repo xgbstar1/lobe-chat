@@ -1,7 +1,7 @@
 import { Typography } from 'antd';
 import { createStyles } from 'antd-style';
 import isEqual from 'fast-deep-equal';
-import { memo } from 'react';
+import { CSSProperties, memo } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
 import { useChatStore } from '@/store/chat';
@@ -24,9 +24,10 @@ const useStyles = createStyles(({ css, token, isDarkMode }) => ({
 interface ThreadProps {
   id: string;
   placement: 'start' | 'end';
+  style?: CSSProperties;
 }
 
-const Thread = memo<ThreadProps>(({ id, placement }) => {
+const Thread = memo<ThreadProps>(({ id, placement, style }) => {
   const { styles } = useStyles();
 
   const threads = useChatStore(threadSelectors.getThreadsBySourceMsgId(id), isEqual);
@@ -36,7 +37,7 @@ const Thread = memo<ThreadProps>(({ id, placement }) => {
       direction={placement === 'end' ? 'horizontal-reverse' : 'horizontal'}
       gap={12}
       paddingInline={16}
-      style={{ paddingBottom: 16 }}
+      style={{ paddingBottom: 16, ...style }}
     >
       <div style={{ width: 40 }} />
       <Flexbox className={styles.container} gap={4} padding={4} style={{ width: 'fit-content' }}>

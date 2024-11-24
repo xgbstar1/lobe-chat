@@ -80,7 +80,10 @@ export interface AIGenerateAction {
   /**
    * Resends a specific message, optionally using a trace ID for tracking
    */
-  internal_resendMessage: (id: string, traceId?: string) => Promise<void>;
+  internal_resendMessage: (
+    id: string,
+    params?: { traceId?: string; messages?: ChatMessage[]; threadId?: string },
+  ) => Promise<void>;
   /**
    * Toggles the loading state for AI message generation, managing the UI feedback
    */
@@ -103,7 +106,7 @@ export const generateAIChat: StateCreator<
 > = (set, get) => ({
   delAndRegenerateMessage: async (id) => {
     const traceId = chatSelectors.getTraceIdByMessageId(id)(get());
-    get().internal_resendMessage(id, traceId);
+    get().internal_resendMessage(id, { traceId });
     get().deleteMessage(id);
 
     // trace the delete and regenerate message
@@ -111,7 +114,7 @@ export const generateAIChat: StateCreator<
   },
   regenerateMessage: async (id) => {
     const traceId = chatSelectors.getTraceIdByMessageId(id)(get());
-    await get().internal_resendMessage(id, traceId);
+    await get().internal_resendMessage(id, { traceId });
 
     // trace the delete and regenerate message
     get().internal_traceMessage(id, { eventType: TraceEventType.RegenerateMessage });
@@ -486,9 +489,12 @@ export const generateAIChat: StateCreator<
     };
   },
 
-  internal_resendMessage: async (messageId, traceId) => {
+  internal_resendMessage: async (
+    messageId,
+    { traceId, messages: outChats, threadId: outThreadId } = {},
+  ) => {
     // 1. 构造所有相关的历史记录
-    const chats = chatSelectors.mainDisplayChats(get());
+    const chats = outChats ?? chatSelectors.mainDisplayChats(get());
 
     const currentIndex = chats.findIndex((c) => c.id === messageId);
     if (currentIndex < 0) return;
@@ -521,10 +527,12 @@ export const generateAIChat: StateCreator<
 
     if (!latestMsg) return;
 
+    const threadId = outThreadId ?? activeThreadId;
+
     await internal_coreProcessMessage(contextMessages, latestMsg.id, {
       traceId,
       ragQuery: get().internal_shouldUseRAG() ? latestMsg.content : undefined,
-      threadId: activeThreadId,
+      threadId,
     });
   },
 

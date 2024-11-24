@@ -29,7 +29,7 @@ const ThreadChatItem = memo<ThreadChatItemProps>(({ id, index }) => {
   );
 
   const actionBar = useMemo(
-    () => index > threadStartMessageIndex && <ActionsBar id={id} />,
+    () => index > threadStartMessageIndex && <ActionsBar id={id} inThread />,
     [id, index, threadStartMessageIndex],
   );
 

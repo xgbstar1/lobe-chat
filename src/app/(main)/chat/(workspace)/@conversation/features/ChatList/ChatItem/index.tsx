@@ -51,14 +51,14 @@ export interface ThreadChatItemProps {
 const MainChatItem = memo<ThreadChatItemProps>(({ id, index }) => {
   const { styles, cx } = useStyles();
 
-  const [type] = useAgentStore((s) => {
+  const [displayMode] = useAgentStore((s) => {
     const config = agentSelectors.currentAgentChatConfig(s);
     return [config.displayMode || 'chat'];
   });
 
   const userRole = useChatStore((s) => chatSelectors.getMessageById(id)(s)?.role);
 
-  const placement = type === 'chat' && userRole === 'user' ? 'end' : 'start';
+  const placement = displayMode === 'chat' && userRole === 'user' ? 'end' : 'start';
 
   const [showThread, historyLength] = useChatStore((s) => [
     threadSelectors.hasThreadBySourceMsgId(id)(s),
@@ -81,7 +81,15 @@ const MainChatItem = memo<ThreadChatItemProps>(({ id, index }) => {
       actionBar={actionBar}
       className={showThread ? cx(styles.line, styles[placement]) : ''}
       enableHistoryDivider={enableHistoryDivider}
-      endRender={showThread && <Thread id={id} placement={placement} />}
+      endRender={
+        showThread && (
+          <Thread
+            id={id}
+            placement={placement}
+            style={{ marginTop: displayMode === 'docs' ? 12 : undefined }}
+          />
+        )
+      }
       id={id}
       index={index}
     />

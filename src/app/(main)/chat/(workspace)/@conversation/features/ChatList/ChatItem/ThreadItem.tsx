@@ -1,7 +1,6 @@
 import { Icon } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import dayjs from 'dayjs';
-import isEqual from 'fast-deep-equal';
 import { ChevronRight } from 'lucide-react';
 import { memo } from 'react';
 import { Flexbox } from 'react-layout-kit';
@@ -11,12 +10,18 @@ import { chatSelectors } from '@/store/chat/selectors';
 import { ThreadItem } from '@/types/topic';
 
 const useStyles = createStyles(({ css, token }) => ({
+  active: css`
+    background: ${token.colorFillTertiary};
+  `,
   container: css`
     cursor: pointer;
+
     padding-block: 4px;
     padding-inline: 6px;
-    border-radius: 6px;
+
     font-size: 12px;
+
+    border-radius: 6px;
 
     &:hover {
       background: ${token.colorFillTertiary};
@@ -29,16 +34,21 @@ const useStyles = createStyles(({ css, token }) => ({
 
 const Item = memo<ThreadItem>(({ id, title, lastActiveAt, sourceMessageId }) => {
   const openThreadInPortal = useChatStore((s) => s.openThreadInPortal);
-  const { styles } = useStyles();
-  const messageCount = useChatStore(chatSelectors.countMessagesByThreadId(id), isEqual);
+  const { styles, cx } = useStyles();
+  const [isActive, messageCount] = useChatStore((s) => [
+    s.activeThreadId === id,
+    chatSelectors.countMessagesByThreadId(id)(s),
+  ]);
 
   return (
     <Flexbox
       align={'baseline'}
-      className={styles.container}
+      className={cx(styles.container, isActive && styles.active)}
       gap={8}
       horizontal
       onClick={() => {
+        if (isActive) return;
+
         openThreadInPortal(id, sourceMessageId);
       }}
     >

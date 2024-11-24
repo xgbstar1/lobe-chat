@@ -32,6 +32,8 @@ export interface ChatThreadAction {
    * Sends a new thread message to the AI chat system
    */
   sendThreadMessage: (params: SendThreadMessageParams) => Promise<void>;
+  resendThreadMessage: (messageId: string) => Promise<void>;
+  delAndResendThreadMessage: (messageId: string) => Promise<void>;
   createThread: (params: {
     message: CreateMessageParams;
     sourceMessageId: string;
@@ -46,6 +48,7 @@ export interface ChatThreadAction {
   updateThreadTitle: (id: string, title: string) => Promise<void>;
   removeThread: (id: string) => Promise<void>;
   switchThread: (id: string) => void;
+
   internal_updateThreadTitleInSummary: (id: string, title: string) => void;
   internal_updateThreadLoading: (id: string, loading: boolean) => void;
   internal_updateThread: (id: string, data: Partial<ThreadItem>) => Promise<void>;
@@ -177,7 +180,18 @@ export const chatThreadMessage: StateCreator<
       await get().summaryThreadTitle(portalThread.id, chats);
     }
   },
+  resendThreadMessage: async (messageId) => {
+    const chats = threadSelectors.portalThreadMessages(get());
 
+    await get().internal_resendMessage(messageId, {
+      messages: chats,
+      threadId: get().portalThreadId,
+    });
+  },
+  delAndResendThreadMessage: async (id) => {
+    get().resendThreadMessage(id);
+    get().deleteMessage(id);
+  },
   createThread: async ({ message, sourceMessageId, topicId, type }) => {
     set({ isCreatingThread: true }, false, n('creatingThread/start'));
 
