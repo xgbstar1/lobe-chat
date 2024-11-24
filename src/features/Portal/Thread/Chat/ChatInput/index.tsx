@@ -11,7 +11,7 @@ import { systemStatusSelectors } from '@/store/global/selectors';
 
 import TextArea from './TextArea';
 
-const leftActions = ['stt', 'token'] as ActionKeys[];
+const leftActions = ['stt', 'portalToken'] as ActionKeys[];
 
 const rightActions = [] as ActionKeys[];
 

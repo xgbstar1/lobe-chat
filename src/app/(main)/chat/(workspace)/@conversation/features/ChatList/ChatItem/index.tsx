@@ -10,12 +10,14 @@ import { chatSelectors, threadSelectors } from '@/store/chat/selectors';
 
 import Thread from './Thread';
 
-const useStyles = createStyles(({ css, token }) => {
+const useStyles = createStyles(({ css, token, isDarkMode }) => {
+  const borderColor = isDarkMode ? token.colorFillSecondary : token.colorFillTertiary;
+
   return {
     end: css`
       &::after {
         inset-inline-end: 36px;
-        border-inline-end: 2px solid ${token.colorFillTertiary};
+        border-inline-end: 2px solid ${borderColor};
         border-end-end-radius: 8px;
       }
     `,
@@ -28,13 +30,13 @@ const useStyles = createStyles(({ css, token }) => {
 
         width: 32px;
 
-        border-block-end: 2px solid ${token.colorFillTertiary};
+        border-block-end: 2px solid ${borderColor};
       }
     `,
     start: css`
       &::after {
         inset-inline-start: 36px;
-        border-inline-start: 2px solid ${token.colorFillTertiary};
+        border-inline-start: 2px solid ${borderColor};
         border-end-start-radius: 8px;
       }
     `,

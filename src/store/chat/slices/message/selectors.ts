@@ -58,28 +58,31 @@ const activeBaseChatsWithoutTool = (s: ChatStoreState) => {
  */
 const mainDisplayChats = (s: ChatStoreState): ChatMessage[] => {
   // 如果没有 activeThreadId，则返回所有的主消息
-  const mains = activeBaseChats(s).filter((m) => !m.threadId);
-  if (!s.activeThreadId) return mains;
+  const displayChats = activeBaseChatsWithoutTool(s);
+  if (!s.activeThreadId) return displayChats.filter((m) => !m.threadId);
 
   const thread = s.threadMaps[s.activeTopicId!]?.find((t) => t.id === s.activeThreadId);
 
-  if (!thread) return mains;
+  if (!thread) return displayChats.filter((m) => !m.threadId);
 
-  const sourceIndex = mains.findIndex((m) => m.id === thread.sourceMessageId);
-  const sliced = mains.slice(0, sourceIndex + 1);
+  const sourceIndex = displayChats.findIndex((m) => m.id === thread.sourceMessageId);
+  const sliced = displayChats.slice(0, sourceIndex + 1);
 
-  return [...sliced, ...activeBaseChats(s).filter((m) => m.threadId === s.activeThreadId)];
+  return [...sliced, ...displayChats.filter((m) => m.threadId === s.activeThreadId)];
 };
 
-const mainDisplayChatIDs = (s: ChatStoreState) => {
-  return mainDisplayChats(s).map((s) => s.id);
-};
+const mainDisplayChatIDs = (s: ChatStoreState) => mainDisplayChats(s).map((s) => s.id);
 
-const currentChatsWithHistoryConfig = (s: ChatStoreState): ChatMessage[] => {
+const mainAIChatsWithHistoryConfig = (s: ChatStoreState): ChatMessage[] => {
   const chats = activeBaseChats(s);
   const config = agentSelectors.currentAgentChatConfig(useAgentStore.getState());
 
   return chatHelpers.getSlicedMessagesWithConfig(chats, config);
+};
+
+const mainAIChatsMessageString = (s: ChatStoreState): string => {
+  const chats = mainAIChatsWithHistoryConfig(s);
+  return chats.map((m) => m.content).join('');
 };
 
 const currentToolMessages = (s: ChatStoreState) => {
@@ -109,11 +112,6 @@ const showInboxWelcome = (s: ChatStoreState): boolean => {
 
   const data = activeBaseChats(s);
   return data.length === 0;
-};
-
-const chatsMessageString = (s: ChatStoreState): string => {
-  const chats = currentChatsWithHistoryConfig(s);
-  return chats.map((m) => m.content).join('');
 };
 
 const getMessageById = (id: string) => (s: ChatStoreState) =>
@@ -175,11 +173,9 @@ const isSendButtonDisabledByMessage = (s: ChatStoreState) =>
 export const chatSelectors = {
   activeBaseChats,
   activeBaseChatsWithoutTool,
-  chatsMessageString,
   countMessagesByThreadId,
   currentChatKey,
   currentChatLoadingState,
-  currentChatsWithHistoryConfig,
   currentToolMessages,
   currentUserFiles,
   getMessageById,
@@ -197,6 +193,8 @@ export const chatSelectors = {
   isSendButtonDisabledByMessage,
   isToolCallStreaming,
   latestMessage,
+  mainAIChatsMessageString,
+  mainAIChatsWithHistoryConfig,
   mainDisplayChatIDs,
   mainDisplayChats,
   showInboxWelcome,

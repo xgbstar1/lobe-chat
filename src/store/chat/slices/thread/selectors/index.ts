@@ -82,6 +82,12 @@ const portalThreadMessages = (s: ChatStoreState) => {
   return [...parentMessages, draftMessage, ...afterMessages].filter(Boolean) as ChatMessage[];
 };
 
+const portalThreadMessagesString = (s: ChatStoreState) => {
+  const messages = portalThreadMessages(s);
+
+  return messages.map((m) => m.content).join('');
+};
+
 const portalThreadMessageIds = (s: ChatStoreState): string[] => {
   const parentMessages = threadParentMessageIds(s);
   const portalMessages = getMessageIdsByThreadId(s.portalThreadId)(s);
@@ -133,6 +139,7 @@ export const threadSelectors = {
   hasThreadBySourceMsgId,
   portalThreadMessageIds,
   portalThreadMessages,
+  portalThreadMessagesString,
   threadParentMessages,
   threadSourceMessageId,
   threadSourceMessageIndex,
