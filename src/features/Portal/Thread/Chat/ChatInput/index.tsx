@@ -50,6 +50,7 @@ const Desktop = memo(() => {
       <DesktopChatInput
         footer={{
           saveTopic: false,
+          sendMore: false,
         }}
         inputHeight={inputHeight}
         leftActions={leftActions}
