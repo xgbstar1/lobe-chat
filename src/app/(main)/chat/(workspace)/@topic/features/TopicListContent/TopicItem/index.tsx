@@ -58,7 +58,7 @@ const TopicItem = memo<ConfigCellProps>(({ title, active, id, fav, threadId }) =
   const threads = useChatStore(threadSelectors.getThreadsByTopic(id));
 
   return (
-    <>
+    <Flexbox style={{ position: 'relative' }}>
       <Flexbox
         align={'center'}
         className={cx(styles.container, 'topic-item', active && !threadId && styles.active)}
@@ -82,8 +82,10 @@ const TopicItem = memo<ConfigCellProps>(({ title, active, id, fav, threadId }) =
         )}
       </Flexbox>
       {active &&
-        threads?.map((item) => <ThreadItem id={item.id} key={item.id} title={item.title} />)}
-    </>
+        threads?.map((item, index) => (
+          <ThreadItem id={item.id} index={index} key={item.id} title={item.title} />
+        ))}
+    </Flexbox>
   );
 });
 
